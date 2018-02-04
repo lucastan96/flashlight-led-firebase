@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Flashlight - Made with Google Firebase</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+        <!--[if lt IE 9]>
+<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+<![endif]-->
+    </head>
+    <body class="bg-dark text-center">
+        <div class="container">
+            <h1 class="text-white" style="margin-top: 100px;"><i class="fa fa-lightbulb-o mr-3" aria-hidden="true"></i>Flashlight</h1>
+            <p class="text-white mb-0" style="font-style: italic;">Remotely control your phone flashlight!</p>
+            <p class="text-white mb-4">Status: <span class="status">Loading</span></p>
+            <button class="btn btn-danger" disabled>Loading</button>
+            <p class="text-white mt-5" style="font-size: 12px;">v1.1, Made with Google Firebase by Lucas.</p>
+        </div>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/4.9.0/firebase.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/4.9.0/firebase-app.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/4.9.0/firebase-database.js"></script>
+        <script>
+            var config = {
+                apiKey: "PLACEHOLDER",
+                authDomain: "PLACEHOLDER",
+                databaseURL: "PLACEHOLDER",
+                projectId: "PLACEHOLDER",
+                storageBucket: "PLACEHOLDER",
+                messagingSenderId: "PLACEHOLDER"
+            };
+
+            firebase.initializeApp(config);
+            var database = firebase.database();
+            var ref = database.ref('flashlight');
+
+            var toggle, online;
+
+            //            ref.once('value').then(gotData, errData);
+
+            ref.on('value', function(data) {
+                gotData(data);
+            });
+
+            function gotData(data) {
+                var flashlight = data.val();
+                toggle = flashlight.toggle;
+                online = flashlight.online;
+
+                if (online == 1) {
+                    $(".btn").removeAttr("disabled");
+                    $(".status").text("Enabled").css("color", "green");
+                } else {
+                    $(".btn").attr("disabled", true);
+                    $(".status").text("Disabled").css("color", "red");
+                }
+
+                if (toggle == 1) {
+                    $("body").removeClass("bg-dark").addClass("bg-light");
+                    $("h1, p").removeClass("text-white");
+                    $(".btn").text("Turn Off");
+                } else {
+                    $("body").removeClass("bg-light").addClass("bg-dark");
+                    $("h1, p").addClass("text-white");
+                    $(".btn").text("Turn On");
+                }
+            }
+
+            $(".btn").click(function (e) {
+                e.preventDefault();
+
+                if (online == 1) {
+                    if ($("body").hasClass("bg-dark")) {
+                        toggle = 1;
+                        $("body").removeClass("bg-dark").addClass("bg-light");
+                        $("h1, p").removeClass("text-white");
+                        $(".btn").text("Turn Off");
+                    } else {
+                        toggle = 0;
+                        $("body").removeClass("bg-light").addClass("bg-dark");
+                        $("h1, p").addClass("text-white");
+                        $(".btn").text("Turn On");
+                    }
+                }
+
+                ref.update({
+                    toggle: toggle
+                });
+            });
+        </script>
+    </body>
+</html>
